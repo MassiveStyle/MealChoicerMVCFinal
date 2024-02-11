@@ -1,0 +1,20 @@
+﻿@model Meal
+
+<h2>Update @Model.Name</h2>
+<hr />
+
+<form method="post" asp-controller="Meal" asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger" />
+    </div>
+
+    <input type="submit" value="Update meal" class="btn btn-primary" />
+</form>
+<div>
+    <a asp-controller="Meal" asp-action="Index">Back to list</a>
+</div>

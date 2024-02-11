@@ -1,0 +1,44 @@
+﻿@model MealListViewModel
+
+
+@if (TempData["MealDeleted"] != null)
+{
+    <p class="text-success">@TempData["MealDeleted"]</p>
+}
+
+@if (!Model.Meals.Any())
+{
+    <p>No results</p>
+}
+else
+{
+    <form method="post" asp-controller="Meal" asp-action="GetRandomMeals">
+        <input type="number" name="howManyMeals"/>
+        <button type="submit" class="btn btn-primary">Get Random Meals</button>
+    </form>
+
+    <table class="table table-condensed table-bordered">
+        <tr>
+            <th>
+                Name
+            </th>
+        </tr>
+
+        @foreach (var meal in Model.Meals)
+        {
+            <tr>
+                <td>@meal.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@meal.Id.ToString()">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@meal.Id.ToString()">Delete</a>
+
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="Add">Add new meal</a>
+</p>
