@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using System.Linq;
 
 namespace MealChoicerMVCFinal.Services
 {
@@ -55,37 +56,41 @@ namespace MealChoicerMVCFinal.Services
 
         }
 
-        public IEnumerable<Meal> GetRandomMeals(Meal meal, int howManyMeals)
+        public IEnumerable<Meal> GetRandomMeals(int howManyMeals)
         {
             int mealsPerGroup = 7;
-            int numberOfGroups = (int)Math.Ceiling((double)howManyMeals / mealsPerGroup);
             List<Meal> randomMeals = new List<Meal>();
+            List<Meal> mealsToAddIncomplete = new List<Meal>();
             int remainingMealsToGenerate = howManyMeals;
 
-
-            for (int groupIndex = 0; groupIndex <= numberOfGroups && remainingMealsToGenerate > 0; groupIndex++)
+            while (remainingMealsToGenerate > 0)
             {
+                int mealsToGenerate = Math.Min(mealsPerGroup, mealsPerGroup - mealsToAddIncomplete.Count);
+
                 var pipeline = new List<BsonDocument>
                 {
-                    new BsonDocument("$sample", new BsonDocument("size", Math.Min(mealsPerGroup, remainingMealsToGenerate))),
+                    new BsonDocument("$sample", new BsonDocument("size", mealsToGenerate)),
                 };
 
                 var randomMealDocument = _mongoDBService._mealCollection.Aggregate<BsonDocument>(pipeline).ToList();
+                IEnumerable<Meal> groupMeals = randomMealDocument.Select(bsonDocument => BsonSerializer.Deserialize<Meal>(bsonDocument));
 
-                var groupMeals = randomMealDocument.Select(bsonDocument => BsonSerializer.Deserialize<Meal>(bsonDocument));
+                var excludeMeals = randomMeals.TakeLast(mealsPerGroup).Concat(mealsToAddIncomplete).ToList();
+                var mealsToAdd = groupMeals.Except(excludeMeals).ToList();
 
-                var excludeMeals = randomMeals.TakeLast(mealsPerGroup);
+                mealsToAddIncomplete.AddRange(mealsToAdd);
 
-                groupMeals = groupMeals.Except(excludeMeals);
-
-                randomMeals.AddRange(groupMeals);
+                if (mealsToAddIncomplete.Count == mealsPerGroup)
+                {
+                    randomMeals.AddRange(mealsToAddIncomplete);
+                    mealsToAddIncomplete.Clear();
+                }
 
                 remainingMealsToGenerate = howManyMeals - randomMeals.Count;
-
             }
-
 
             return randomMeals.Take(howManyMeals);
         }
+
     }
 }

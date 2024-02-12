@@ -10,6 +10,6 @@ namespace MealChoicerMVCFinal.Services
         void AddMeal(Meal newMeal);
         void EditMeal(Meal editMeal);
         void DeleteMeal(Meal mealToDelete);
-        IEnumerable<Meal> GetRandomMeals(Meal meal, int howManyMeals);
+        IEnumerable<Meal> GetRandomMeals(int howManyMeals);
     }
 }

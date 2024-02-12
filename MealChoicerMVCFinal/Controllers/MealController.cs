@@ -116,10 +116,10 @@ namespace MealChoicerMVCFinal.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetRandomMeals(Meal meal, int howManyMeals)
+        public IActionResult GetRandomMeals(int howManyMeals)
         {
 
-            var getRandomMeals = _mealService.GetRandomMeals(meal, howManyMeals);
+            var getRandomMeals = _mealService.GetRandomMeals(howManyMeals);
 
             MealListViewModel viewModel = new()
             {

@@ -18,19 +18,17 @@ namespace MealChoicerMVCFinal.Models
 
         public string? Ingredients { get; set; }
 
-        public override bool Equals(object? obj)
+        public bool Equals (Meal other)
         {
-            return Equals(obj as Meal);
-        }
+            if (other == null)
+                return false;
 
-        public bool Equals(Meal other)
-        {
-            return other != null && Id == other.Id;
+            return this.Id == other.Id && this.Name == other.Name;
         }
 
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return (Id?.GetHashCode() ?? 0) ^ (Name?.GetHashCode() ?? 0);
         }
     }
 }
