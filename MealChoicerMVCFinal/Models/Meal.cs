@@ -18,7 +18,9 @@ namespace MealChoicerMVCFinal.Models
 
         public string? Ingredients { get; set; }
 
-        public bool Equals (Meal other)
+        public bool pickedInLast7Meals { get; set; }
+
+        public bool Equals(Meal other)
         {
             if (other == null)
                 return false;

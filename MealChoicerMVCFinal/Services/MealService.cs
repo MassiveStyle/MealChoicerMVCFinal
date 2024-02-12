@@ -60,37 +60,54 @@ namespace MealChoicerMVCFinal.Services
         {
             int mealsPerGroup = 7;
             List<Meal> randomMeals = new List<Meal>();
-            List<Meal> mealsToAddIncomplete = new List<Meal>();
+            List<Meal> mealsToAdd = new List<Meal>();
+            List<string> updatedMealIds = new List<string>();
             int remainingMealsToGenerate = howManyMeals;
 
             while (remainingMealsToGenerate > 0)
             {
-                int mealsToGenerate = Math.Min(mealsPerGroup, mealsPerGroup - mealsToAddIncomplete.Count);
+                int mealsToGenerate = Math.Min(mealsPerGroup, mealsPerGroup - mealsToAdd.Count);
 
                 var pipeline = new List<BsonDocument>
                 {
                     new BsonDocument("$sample", new BsonDocument("size", mealsToGenerate)),
+                    new BsonDocument("$match", new BsonDocument("pickedInLast7Meals", false))
                 };
 
                 var randomMealDocument = _mongoDBService._mealCollection.Aggregate<BsonDocument>(pipeline).ToList();
                 IEnumerable<Meal> groupMeals = randomMealDocument.Select(bsonDocument => BsonSerializer.Deserialize<Meal>(bsonDocument));
 
-                var excludeMeals = randomMeals.TakeLast(mealsPerGroup).Concat(mealsToAddIncomplete).ToList();
-                var mealsToAdd = groupMeals.Except(excludeMeals).ToList();
-
-                mealsToAddIncomplete.AddRange(mealsToAdd);
-
-                if (mealsToAddIncomplete.Count == mealsPerGroup)
+                foreach (Meal meal in groupMeals)
                 {
-                    randomMeals.AddRange(mealsToAddIncomplete);
-                    mealsToAddIncomplete.Clear();
+                    var filter = Builders<Meal>.Filter.Eq("Id", meal.Id);
+                    var update = Builders<Meal>.Update.Set("pickedInLast7Meals", true);
+
+                    _mongoDBService._mealCollection.UpdateOne(filter, update);
+
+                    updatedMealIds.Add(meal.Id);
+                }
+
+                var generatedMeals = groupMeals.ToList();
+                mealsToAdd.AddRange(generatedMeals);
+
+                if (mealsToAdd.Count == mealsPerGroup)
+                {
+                    randomMeals.AddRange(mealsToAdd);
+                    updatedMealIds = updatedMealIds.TakeLast(mealsPerGroup).ToList();
+                    mealsToAdd.Clear();
                 }
 
                 remainingMealsToGenerate = howManyMeals - randomMeals.Count;
+
+                var filter2 = Builders<Meal>.Filter.And(
+                              Builders<Meal>.Filter.Nin("Id", updatedMealIds),
+                              Builders<Meal>.Filter.Eq("pickedInLast7Meals", true));
+
+                var update2 = Builders<Meal>.Update.Set("pickedInLast7Meals", false);
+
+                _mongoDBService._mealCollection.UpdateMany(filter2, update2);
             }
-
-            return randomMeals.Take(howManyMeals);
+            return randomMeals.Take(howManyMeals).ToList();
         }
-
     }
 }
