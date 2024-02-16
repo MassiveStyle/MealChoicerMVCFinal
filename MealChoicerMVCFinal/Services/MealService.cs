@@ -34,7 +34,10 @@ namespace MealChoicerMVCFinal.Services
         public void EditMeal(Meal meal)
         {
             var filter = Builders<Meal>.Filter.Eq("Id", meal.Id);
-            var update = Builders<Meal>.Update.Set("Name", meal.Name);
+            var update = Builders<Meal>.Update.Set("Name", meal.Name)
+                                              .Set("Ingredients", meal.Ingredients)
+                                              .Set("Recipe", meal.Recipe);
+
             var result = _mongoDBService._mealCollection.UpdateOne(filter, update);
 
             if (result.ModifiedCount == 0)

@@ -36,6 +36,8 @@ namespace MealChoicerMVCFinal.Controllers
                 Meal newMeal = new()
                 {
                     Name = mealAddViewModel.Meal.Name,
+                    Ingredients = mealAddViewModel.Meal.Ingredients,
+                    Recipe = mealAddViewModel.Meal.Recipe,
                 };
 
                 _mealService.AddMeal(newMeal);

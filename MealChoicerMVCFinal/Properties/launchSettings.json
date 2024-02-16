@@ -8,6 +8,7 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://130.61.75.21:8080"
+      //"applicationUrl": "http://0.0.0.0:8080"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -31,6 +32,7 @@
     "anonymousAuthentication": true,
     "iisExpress": {
       "applicationUrl": "http://130.61.75.21:16868",
+      //"applicationUrl": "http://0.0.0.0:8080",
       "sslPort": 0
     }
   }

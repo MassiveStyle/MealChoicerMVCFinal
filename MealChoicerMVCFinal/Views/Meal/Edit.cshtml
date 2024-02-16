@@ -12,6 +12,16 @@
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger" />
     </div>
+    <div class="mb-3">
+        <label asp-for="Ingredients" class="form-label"></label>
+        <textarea asp-for="Ingredients" class="form-control"></textarea>
+        <span asp-validation-for="Ingredients" class="text-danger" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Recipe" class="form-label"></label>
+        <textarea asp-for="Recipe" class="form-control"></textarea>
+        <span asp-validation-for="Recipe" class="text-danger" />
+    </div>
 
     <input type="submit" value="Update meal" class="btn btn-primary" />
 </form>
